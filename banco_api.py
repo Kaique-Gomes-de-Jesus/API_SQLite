@@ -66,30 +66,6 @@ async def listar_jogadores():
     #Retorna uma conversão dos resultados em uma lista de dicionários no formato do modelo do Jogador
     return [ {"id":j[0], "nome":j[1], "idade":j[2], "time":j[3]} for j in jogadores ]
 
-#GET: Pegar um jogador específico pelo ID
-@app.get("/jogadores/{jogador_id}", response_model=Jogador)
-async def pegar_jogador(jogador_id:int):
-    conexao, cursor = conectar_bd()
-    cursor.execute("""
-        SELECT 
-            id, nome, idade, time
-        FROM
-            jogadores
-        WHERE
-            id = ?""",
-            (jogador_id,)
-    )
-    #Traz os dados linha por linha
-    jogador = cursor.fetchone()
-    conexao.close()
-
-    #Verifica se o jogador foi encontrado
-    if jogador:
-        #Retorna o jogador no formato do modelo Jogador
-        return {"id":jogador[0], "nome":jogador[1], "idade":jogador[2], "time":jogador[3]}
-    #Se não encontrado, levanta uma exceção HTTP 404
-    raise HTTPException(status_code=404, detail="Jogador não encontrado")
-
 #GET: Filtrar jogadores por time
 @app.get("/jogadores/time/{time}", response_model=List[Jogador])
 async def pegar_jogadores_por_time(time:str):
